@@ -1,0 +1,29 @@
+# Flash settings of the stock Arduino bootloader (bootloader_qio_80m; its image header says DIO).
+# QIO matters: this bootloader switches the flash into quad mode, and Arduino apps built for QIO
+# (SmartBoot included) rely on that. With a DIO bootloader their data reads (NVS, LittleFS)
+# come back blank, and NVS then writes over the real data.
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+
+# Same bootloader options as the Arduino core (framework-arduinoespressif32-libs/esp32s3/sdkconfig).
+# The RTC reserve must match what apps were built with; deep-sleep wake reuses the last app.
+CONFIG_BOOTLOADER_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_BOOTLOADER_FLASH_XMC_SUPPORT=y
+CONFIG_BOOTLOADER_VDDSDIO_BOOST_1_9V=y
+CONFIG_BOOTLOADER_REGION_PROTECTION_ENABLE=y
+CONFIG_BOOTLOADER_WDT_ENABLE=y
+CONFIG_BOOTLOADER_WDT_TIME_MS=9000
+CONFIG_BOOTLOADER_SKIP_VALIDATE_IN_DEEP_SLEEP=y
+CONFIG_BOOTLOADER_RESERVE_RTC_MEM=y
+CONFIG_BOOTLOADER_RESERVE_RTC_SIZE=0x10
+
+# Power-on is the way back to SmartBoot, so rollback is not needed. With it off, an app that
+# never confirms itself (plain ESP-IDF apps) is not bounced back to SmartBoot on its own restarts.
+# CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE is not set
+
+# Info logs so the boot decision shows on the serial console.
+CONFIG_BOOTLOADER_LOG_LEVEL_INFO=y
+
+# Test app logs over the Cardputer's USB port.
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y

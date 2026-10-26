@@ -1,0 +1,12 @@
+# SmartBoot partition layout for the 8MB Cardputer ADV. This is the starting table;
+# SmartBoot adds and removes installed apps (OTA app partitions) and their data
+# partitions in the free space between factory and sbnvs at runtime (src/partitions.cpp).
+# Our bootloader (bootloader/) starts factory on every power-on, so SmartBoot is always
+# reachable. sbnvs/sbdata are SmartBoot's private storage: apps never use these labels.
+# Name,   Type, SubType,  Offset,   Size
+nvs,      data, nvs,      0x9000,   0x5000
+otadata,  data, ota,      0xe000,   0x2000
+factory,  app,  factory,  0x10000,  0x1B0000
+# 0x1C0000 - 0x7EC000 (6.17 MB): free for installed apps and their data
+sbnvs,    data, nvs,      0x7EC000, 0x4000
+sbdata,   data, littlefs, 0x7F0000, 0x10000

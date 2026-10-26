@@ -1,0 +1,8 @@
+# Build output
+.pio/
+bootloader/.pio/
+bootloader/sdkconfig.bootloader
+dist/
+__pycache__/
+# Downloaded by tools/release.sh (Espressif's standalone esptool for the Windows package)
+tools/esptool-windows/
