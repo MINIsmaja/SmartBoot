@@ -9,6 +9,7 @@
 #include "screens.h"
 #include "settings.h"
 #include "ui.h"
+#include "usbdrive.h"
 
 // Downloads (TLS) run on the loop task, and installs draw their progress from inside the
 // download; with the default 8 KB only ~2 KB was left during an install.
@@ -35,6 +36,7 @@ void dimWhenIdle() {
 }  // namespace
 
 void setup() {
+    usbdrive::init();  // before anything uses the serial port
     auto cfg = M5.config();
     M5Cardputer.begin(cfg, true);
     Serial.begin(115200);

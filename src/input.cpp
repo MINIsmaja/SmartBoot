@@ -77,4 +77,6 @@ bool getTextMode() { return textMode; }
 
 uint32_t lastActivityMs() { return lastActivity; }
 
+void touch() { lastActivity = millis(); }
+
 }  // namespace input

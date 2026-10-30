@@ -32,6 +32,9 @@ void connect(const String& ssid, const String& pass, bool save);
 void connectSaved();          // reconnect to the remembered network
 void disconnect();
 void forget();                // drop saved credentials
+void pause();                 // let something else (the file-sharing hotspot) use the radio
+void resume();                // back to normal: reconnect to the saved network
+void devPretendSaved(const String& ssid);  // dev console: act as if ssid were the saved network (not stored)
 
 // Async scan. startScan() returns false if a scan is already running.
 bool startScan();

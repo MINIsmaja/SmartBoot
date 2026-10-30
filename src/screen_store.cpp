@@ -201,7 +201,7 @@ public:
     void onKey(const KeyEvent& e) override {
         switch (e.key) {
             case Key::Up: sel[tab] = max(0, sel[tab] - 1); break;
-            case Key::Down: sel[tab] = min(count() - 1, sel[tab] + 1); break;
+            case Key::Down: sel[tab] = max(0, min(count() - 1, sel[tab] + 1)); break;
             case Key::Left: tab = 0; clampSel(); break;
             case Key::Right: tab = 1; clampSel(); break;
             case Key::Tab: tab = 1 - tab; clampSel(); break;

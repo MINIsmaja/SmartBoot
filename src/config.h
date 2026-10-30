@@ -2,7 +2,7 @@
 
 // Rename the whole firmware here.
 #define APP_NAME    "SmartBoot"
-#define APP_VERSION "0.1.0-beta"
+#define APP_VERSION "1.0.0"
 
 // Screen layout (landscape, 240x135)
 constexpr int SCREEN_W   = 240;

@@ -12,6 +12,7 @@ struct Item { const char* name; const char* desc; Icon icon; uint16_t color; };
 const Item ITEMS[] = {
     {"Firmware Store", "Find and install new firmware", Icon::Store, rgb(0x4F8CFF)},
     {"SD Card", "Install .bin files from your SD card", Icon::SdCard, rgb(0x2FCB8A)},
+    {"Transfer files", "Copy files to your SD card", Icon::Transfer, rgb(0xFF6FAE)},
     {"Wi-Fi", "Get online to download firmware", Icon::Wifi, rgb(0x9B7BFF)},
     {"Settings", "Brightness, sound and colors", Icon::Gear, rgb(0xFF9A3D)},
     {"About", "Device info and key guide", Icon::Info, rgb(0x6E8BB3)},
@@ -43,9 +44,10 @@ class Home : public Screen {
         switch (i - apps::count()) {
             case 0: nav::push(screens::store()); break;
             case 1: nav::push(screens::sdBrowser()); break;
-            case 2: nav::push(screens::wifi()); break;
-            case 3: nav::push(screens::settings()); break;
-            case 4: nav::push(screens::about()); break;
+            case 2: nav::push(screens::transfer()); break;
+            case 3: nav::push(screens::wifi()); break;
+            case 4: nav::push(screens::settings()); break;
+            case 5: nav::push(screens::about()); break;
         }
     }
 

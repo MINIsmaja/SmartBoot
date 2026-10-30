@@ -9,7 +9,7 @@ extern M5Canvas canvas;
 
 namespace ui {
 
-enum class Icon : uint8_t { Store, SdCard, Wifi, Gear, Info, Star, Check, Power };
+enum class Icon : uint8_t { Store, SdCard, Wifi, Gear, Info, Star, Check, Power, Transfer };
 enum class Glyph : uint8_t { None, Up, Down, Left, Right, Enter };
 
 // Footer hint keys: "ud", "lr", "ok", or literal key text such as "esc" / "tab".

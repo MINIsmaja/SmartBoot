@@ -32,6 +32,10 @@ Screen* confirmInstall(const Firmware& fw, const installer::Check& check);
 Screen* install(const Firmware& fw, const installer::Check& check);
 Screen* confirmRemove(const App& app);
 Screen* sdBrowser();  // install .bin files from the microSD card
+Screen* transfer();   // get files onto the SD card: Wi-Fi upload page or USB drive
+Screen* wifiShare();  // the Wi-Fi upload page
+Screen* usbDrive();   // the SD card as a USB drive
+Screen* usbDrivePreview();  // dev console: its running screen without starting USB
 Screen* settings();
 Screen* about();
 Screen* comingSoon(const char* title, ui::Icon icon, uint16_t color, const char* message);

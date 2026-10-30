@@ -18,4 +18,5 @@ void inject(Key key, char ch = 0);
 void setTextMode(bool on);
 bool getTextMode();
 uint32_t lastActivityMs();
+void touch();  // counts as activity (keeps the screen from dimming during a transfer)
 }

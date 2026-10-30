@@ -41,7 +41,9 @@ class WifiScreen : public Screen {
         return constrain(s, 0.0f, (float)max(0, (int)nets.size() * ROW_H - LIST_HEIGHT));
     }
 
-    bool selectedIsSaved() const { return sel < (int)nets.size() && nets[sel].known; }
+    // sel stays 0 while the list is empty (scanning, or nothing found), so it must be checked.
+    bool hasSel() const { return sel >= 0 && sel < (int)nets.size(); }
+    bool selectedIsSaved() const { return hasSel() && nets[sel].known; }
 
     void rescan() {
         if (net::startScan()) { scanning = true; nets.clear(); sel = 0; scroll = 0; }
@@ -77,9 +79,9 @@ public:
     void onKey(const KeyEvent& e) override {
         switch (e.key) {
             case Key::Up: sel = max(0, sel - 1); break;
-            case Key::Down: sel = min((int)nets.size() - 1, sel + 1); break;
+            case Key::Down: sel = max(0, min((int)nets.size() - 1, sel + 1)); break;
             case Key::Ok:
-                if (sel < (int)nets.size()) connectTo(nets[sel]);
+                if (hasSel()) connectTo(nets[sel]);
                 break;
             case Key::Char:
                 if (e.ch == 'r' || e.ch == 'R') {

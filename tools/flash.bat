@@ -1,9 +1,9 @@
 @echo off
 setlocal
-title SmartBoot beta - flasher
+title SmartBoot - flasher
 cd /d "%~dp0"
 echo.
-echo   SmartBoot beta flasher for the M5Stack Cardputer ADV
+echo   SmartBoot flasher for the M5Stack Cardputer ADV
 echo   -----------------------------------------------------
 echo   1. Plug the Cardputer ADV into this PC with a USB-C data cable.
 echo   2. Turn it on.

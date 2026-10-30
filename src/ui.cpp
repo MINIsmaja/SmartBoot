@@ -105,6 +105,16 @@ void drawIcon(Icon icon, int cx, int cy, int s, uint16_t c, uint16_t bg) {
             canvas.drawWideLine(cx - s * 0.05f, cy + s * 0.16f, cx + s * 0.22f, cy - s * 0.14f, w, bg);
             break;
         }
+        case Icon::Transfer: {  // two arrows, one each way
+            int t = max(2, s / 9);
+            float half = s * 0.38f, head = s * 0.20f, dy = s * 0.17f;
+            for (int dir = -1; dir <= 1; dir += 2) {
+                float y = cy - dir * dy, tip = cx + dir * half, tail = cx - dir * half;
+                canvas.fillRect(min(tip - dir * head, tail), y - t / 2.0f, fabsf(tip - dir * head - tail) + 1, t, c);
+                canvas.fillTriangle(tip, y, tip - dir * head, y - head * 0.75f, tip - dir * head, y + head * 0.75f, c);
+            }
+            break;
+        }
         case Icon::Power: {
             float r = s * 0.38f, t = max(2.0f, s * 0.10f);
             canvas.fillArc(cx, cy + s * 0.04f, r - t, r, 300, 360, c);

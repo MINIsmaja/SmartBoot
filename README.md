@@ -3,9 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="../../releases/latest"><img alt="Download the beta" src="https://img.shields.io/badge/download-v0.1.0--beta-4F8CFF?style=for-the-badge"></a>
+  <a href="../../releases/latest"><img alt="Download SmartBoot" src="https://img.shields.io/badge/download-v1.0.0-4F8CFF?style=for-the-badge"></a>
   <img alt="Device: Cardputer ADV" src="https://img.shields.io/badge/device-Cardputer%20ADV-2FCB8A?style=for-the-badge">
-  <img alt="Status: public beta" src="https://img.shields.io/badge/status-public%20beta-FF9A3D?style=for-the-badge">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-9B7BFF?style=for-the-badge"></a>
 </p>
 
@@ -34,6 +33,10 @@ No partition tables, no offsets, no flashing tools. Just apps.
   and their storage grows back automatically when you delete other apps.
 - **Install from your SD card.** A clean file browser that shows only folders and `.bin` files.
   SmartBoot reads each file before installing it and refuses files built for a different chip.
+- **Get files onto your SD card.** MP3s, ROMs and other things apps expect on the card: open
+  *Transfer files* and either use **Wi-Fi upload** (the Cardputer makes its own hotspot with a QR
+  code; drag files in from a web page on your phone or computer, no router or internet needed) or
+  **USB drive** (plug in a cable and the card shows up like a USB stick).
 - **Built for the ADV.** Every recommended pick supports the Cardputer ADV's keyboard. Older
   firmware written for the original Cardputer often can't read it.
 - **Your data stays yours.** Your Wi-Fi password and settings live in SmartBoot's own storage area,
@@ -148,13 +151,13 @@ Download the files from the [latest release](../../releases/latest).
 
 ### Windows: double-click
 
-1. Download **`SmartBoot-v0.1.0-beta-windows.zip`** and unzip it.
+1. Download **`SmartBoot-v1.0.0-windows.zip`** and unzip it.
 2. Connect the Cardputer ADV with a USB-C **data** cable and turn it on.
 3. Double-click **`flash.bat`** and follow the instructions.
 
 ### Any computer: in the browser (Chrome or Edge)
 
-1. Download **`SmartBoot-v0.1.0-beta.bin`**.
+1. Download **`SmartBoot-v1.0.0.bin`**.
 2. Open Espressif's web flasher: <https://espressif.github.io/esptool-js/>
 3. Click **Connect** and pick the Cardputer's port.
 4. Set the flash address to **`0x0`**, choose the `.bin` file and click **Program**.
@@ -163,7 +166,7 @@ Download the files from the [latest release](../../releases/latest).
 
 ```sh
 pip install esptool
-esptool --chip esp32s3 write_flash 0x0 SmartBoot-v0.1.0-beta.bin
+esptool --chip esp32s3 write_flash 0x0 SmartBoot-v1.0.0.bin
 ```
 
 If the Cardputer isn't found, hold the **G0** button while plugging it in and try again.
@@ -186,6 +189,12 @@ If the Cardputer isn't found, hold the **G0** button while plugging it in and tr
 - **Start an app** by selecting its tile on Home and pressing Enter.
 - **Come back to SmartBoot** by turning the Cardputer off and on.
 - **Install from the SD card** with the SD Card tile. Put `.bin` files anywhere on a FAT32 card.
+- **Add files to your SD card** with the Transfer files tile:
+  - *Wi-Fi upload*: scan the QR code (or join the network shown on screen), then open the page that
+    appears, or go to `192.168.4.1`. Add files or whole folders, make folders, rename, delete and
+    download. Your Cardputer's own Wi-Fi connection is paused meanwhile. Press Esc to stop.
+  - *USB drive*: plug the Cardputer into a computer and press Enter. When you are done, **eject the
+    drive on the computer first**, then press Esc on the Cardputer.
 
 ### How space works
 
@@ -231,8 +240,7 @@ install engine to the custom bootloader and the build tools. Study it, improve i
 your own projects. That includes the bootloader ([`bootloader/`](bootloader)), which M5Launcher
 doesn't publish.
 
-This is a **beta**: expect a few rough edges. Found a bug or have an idea? Please
-[open an issue](../../issues). Pull requests are welcome too.
+Found a bug or have an idea? Please [open an issue](../../issues). Pull requests are welcome too.
 
 ### Build from source
 
@@ -267,17 +275,28 @@ SmartBoot is built and tested for the Cardputer ADV only.
 **Why can't I install UIFlow2?**
 It needs the whole 8 MB on its own. SmartBoot tells you this before anything is changed.
 
+**The Wi-Fi upload page didn't open by itself.**
+Open a browser and go to `192.168.4.1`. Your phone may say the hotspot has no internet; stay
+connected to it anyway, the page works without internet.
+
+**Why does USB drive mode make the serial port disappear?**
+The Cardputer's single USB port is either the serial/flash port or a drive. In USB drive mode it is
+the drive; leaving the mode restarts the Cardputer and gives the port back.
+
 **Is the Wi-Fi 5 GHz?**
 No, the Cardputer supports 2.4 GHz Wi-Fi only.
 
 ---
 
-## Known limitations (beta)
+## Known limitations
 
 - Opening a firmware's details takes a few seconds while it checks the download.
 - The store's *All* tab shows the 150 most popular Cardputer firmwares, and not all of them support the ADV.
   The *Recommended* tab only lists ADV-compatible ones.
 - Firmware that needs a separate data file download isn't supported yet (none of the popular ones do).
+- USB drive mode is a full-speed USB device: about 0.5 MB/s writing to the card and about 0.2 MB/s
+  reading. Wi-Fi upload speed depends on your phone or computer. Big ROM sets take a few minutes.
+- The USB drive code reserves about 45 KB of the Cardputer's RAM for the whole time SmartBoot runs.
 
 ---
 

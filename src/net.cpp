@@ -17,7 +17,13 @@ uint32_t connectStart = 0;
 uint32_t lastRetry = 0;
 constexpr uint32_t CONNECT_TIMEOUT_MS = 20000;
 constexpr uint32_t RETRY_MS = 10000;
+constexpr uint8_t SCAN_RETRIES = 2;
+constexpr uint32_t SCAN_RETRY_MS = 400;
+bool suspended = false;        // pause(): poll() leaves the radio alone
 bool scanRunning = false;
+bool resumeAfterScan = false;  // a connect attempt was paused so the radio could scan
+uint8_t scanRetriesLeft = 0;
+uint32_t scanRetryAt = 0;      // nonzero: the next scan try is due at this time
 
 Preferences prefs;
 
@@ -40,6 +46,8 @@ void persist(const String& ssid, const String& pass) {
 void startAttempt(const String& ssid, const String& pass) {
     curSsid = ssid;
     curPass = pass;
+    resumeAfterScan = false;  // a new attempt replaces the paused one
+    scanRetriesLeft = 0;      // and a scan it breaks is not started again over it
     WiFi.disconnect();
     WiFi.begin(ssid.c_str(), pass.c_str());
     curState = net::State::Connecting;
@@ -115,6 +123,7 @@ void connectSaved() {
 void disconnect() {
     WiFi.disconnect();
     pendingSave = false;
+    resumeAfterScan = false;
     curState = State::Off;
 }
 
@@ -124,7 +133,29 @@ void forget() {
     disconnect();
 }
 
+void pause() {
+    suspended = true;
+    scanRunning = false;
+    scanRetryAt = 0;
+    pendingSave = false;
+    resumeAfterScan = false;
+    WiFi.disconnect();
+    curState = State::Off;
+}
+
+void resume() {
+    suspended = false;
+    if (savedSsid.length()) connectSaved();
+}
+
+void devPretendSaved(const String& ssid) {
+    savedSsid = ssid;
+    savedPass = "devpassword";
+    connectSaved();
+}
+
 void poll() {
+    if (suspended) return;
     wl_status_t s = WiFi.status();
     switch (curState) {
         case State::Connecting:
@@ -134,7 +165,7 @@ void poll() {
                     persist(curSsid, curPass);
                     pendingSave = false;
                 }
-            } else if (millis() - connectStart > CONNECT_TIMEOUT_MS) {
+            } else if (!scanRunning && millis() - connectStart > CONNECT_TIMEOUT_MS) {
                 curState = State::Failed;
                 lastRetry = millis();
                 if (pendingSave) {  // a new password that didn't work is not retried
@@ -150,7 +181,8 @@ void poll() {
             // Only the known-good network keeps retrying in the background.
             if (onTarget(s)) {
                 curState = State::Online;
-            } else if (savedSsid.length() && curSsid == savedSsid && millis() - lastRetry > RETRY_MS) {
+            } else if (!scanRunning && savedSsid.length() && curSsid == savedSsid &&
+                       millis() - lastRetry > RETRY_MS) {
                 lastRetry = millis();
                 startAttempt(savedSsid, savedPass);
             }
@@ -187,22 +219,44 @@ int bars() {
     return 0;
 }
 
+// The radio can't scan while it is busy connecting: the scan fails at once. That is the normal
+// state whenever the saved network is out of range (away from home), because we keep trying to
+// reach it. So stop trying until the scan is done; scanResults() then picks the attempt up again.
+void beginScan() {
+    if (curState != State::Online) {
+        WiFi.disconnect();
+        if (curState == State::Connecting) resumeAfterScan = true;
+    }
+    WiFi.scanNetworks(true, false);  // async, hide duplicates off; a failure shows up in scanComplete()
+}
+
 bool startScan() {
-    if (scanRunning) return false;
-    WiFi.scanDelete();
-    WiFi.scanNetworks(true, false);  // async, hide duplicates off
+    if (scanRunning || suspended) return false;
     scanRunning = true;
+    scanRetriesLeft = SCAN_RETRIES;
+    scanRetryAt = 0;
+    beginScan();
     return true;
 }
 
 bool scanning() { return scanRunning; }
 
 int scanResults(std::vector<Network>& out) {
+    if (scanRetryAt) {
+        if (millis() < scanRetryAt) return -1;
+        scanRetryAt = 0;
+        beginScan();
+        return -1;
+    }
     int n = WiFi.scanComplete();
     if (n == WIFI_SCAN_RUNNING) return -1;
+    if (n <= 0 && scanRetriesLeft) {  // failed or cut short because the radio was busy: try again
+        scanRetriesLeft--;
+        scanRetryAt = millis() + SCAN_RETRY_MS;
+        return -1;
+    }
     scanRunning = false;
     out.clear();
-    if (n <= 0) return 0;
     for (int i = 0; i < n; i++) {
         Network net;
         net.ssid = WiFi.SSID(i);
@@ -222,6 +276,7 @@ int scanResults(std::vector<Network>& out) {
         if (!dup) out.push_back(net);
     }
     WiFi.scanDelete();
+    if (resumeAfterScan) startAttempt(curSsid, curPass);  // also clears resumeAfterScan
     // Saved network first, then strongest signal.
     std::sort(out.begin(), out.end(), [](const Network& a, const Network& b) {
         if (a.known != b.known) return a.known;

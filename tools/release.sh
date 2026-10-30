@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the public beta: one merged image (bootloader + partition table + SmartBoot) to
+# Build the release: one merged image (bootloader + partition table + SmartBoot) to
 # flash at 0x0, plus the Windows package (flash.bat + esptool.exe). Output in dist/.
 #   tools/release.sh            -> dist/SmartBoot-v<version>.bin, .sha256, -windows.zip
 set -e

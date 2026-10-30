@@ -165,7 +165,7 @@ public:
         }
         switch (e.key) {
             case Key::Up: sel = max(0, sel - 1); break;
-            case Key::Down: sel = min(count() - 1, sel + 1); break;
+            case Key::Down: sel = max(0, min(count() - 1, sel + 1)); break;
             case Key::Ok: case Key::Right: open(); break;
             case Key::Back: case Key::Left: up(); break;
             case Key::Tab: {
